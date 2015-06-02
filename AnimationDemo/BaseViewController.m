@@ -35,7 +35,7 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
 
 }
 
-@interface BaseViewController ()
+@interface BaseViewController ()<UITextFieldDelegate>
 @property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @property (nonatomic, strong) UIImageView *status;
 @property (nonatomic, strong) UILabel *label;
@@ -109,6 +109,8 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     
     self. statusPosition =self. status.center;
 
+    self.username.delegate = self;
+    self.password.delegate = self;
 
 }
 -(void)beginAnimation{
@@ -133,15 +135,20 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     [fadeIn setFillMode:kCAFillModeBackwards];
     
     
-    [fadeIn setBeginTime:CACurrentMediaTime() + 0.5];
-    [_cloud1.layer addAnimation:fadeIn forKey:nil];
-    [fadeIn setBeginTime:CACurrentMediaTime() + 0.7];
-    [_cloud2.layer addAnimation:fadeIn forKey:nil];
-    [fadeIn setBeginTime:CACurrentMediaTime() + 0.9];
-    [_cloud3.layer addAnimation:fadeIn forKey:nil];
-    [fadeIn setBeginTime:CACurrentMediaTime() +1.1];
-    [_cloud4.layer addAnimation:fadeIn forKey:nil];
+//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.5];
+//    [_cloud1.layer addAnimation:fadeIn forKey:nil];
+//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.7];
+//    [_cloud2.layer addAnimation:fadeIn forKey:nil];
+//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.9];
+//    [_cloud3.layer addAnimation:fadeIn forKey:nil];
+//    [fadeIn setBeginTime:CACurrentMediaTime() +1.1];
+//    [_cloud4.layer addAnimation:fadeIn forKey:nil];
     
+    [self animateCloud:self.cloud1.layer];
+    [self animateCloud:self.cloud2.layer];
+    [self animateCloud:self.cloud3.layer];
+    [self animateCloud:self.cloud4.layer];
+
 }
 
 - (void)showTitleAndDetail{
@@ -289,6 +296,51 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     [balloon addAnimation:flight forKey:nil];
     [balloon setPosition:CGPointMake(-50.0, self.loginButton.center.y
                                      )];
+    
+}
+- (void)animateCloud :(CALayer *)layer{
+    float cloudSpeed = 60.0 / (double)self.view.layer.frame.size.width;
+    NSTimeInterval duration = (double)(self.view.layer.frame.size.width -  layer.frame.origin.x) *cloudSpeed;
+    
+    CABasicAnimation *cloudMove = [CABasicAnimation animationWithKeyPath:@"position.x"];
+    [cloudMove setDuration:duration];
+    [cloudMove setToValue:[NSNumber numberWithDouble:(self.view.bounds.size.width + layer.bounds.size.width /2)]];
+    cloudMove.delegate = self;
+    [cloudMove setValue:@"cloud" forKey:@"name"];
+    [cloudMove setValue:layer forKey:@"layer"];
+    
+    [layer addAnimation:cloudMove forKey:nil];
+}
+-(void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag{
+    if ([anim valueForKey:@"name"]) {
+        NSString *name = [anim valueForKey:@"name"];
+        if ( [name isEqualToString:@"form"]) {
+            NSLog(@"form annimation stop");
+            CALayer *layer = [anim  valueForKey:@"layer"];
+            [anim setValue:nil forKey:@"layer"];
+        
+            CABasicAnimation *pulse = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+            [pulse setFromValue:[NSNumber numberWithFloat: 1.25]];
+            [pulse setToValue:[NSNumber numberWithFloat:1.0]];
+            [pulse setDuration:0.25];
+            [layer  addAnimation:pulse forKey:nil];
+        }else if (  [name isEqualToString:@"cloud"]){
+            CALayer *layer = [anim valueForKey:@"layer"];
+            [anim setValue:nil forKey:@"layer"];
+            
+            [layer setPosition:CGPointMake(-layer.bounds.size.width/2, layer.position.y) ] ;
+            delay(0.5, ^{
+                [self animateCloud:layer];
+            });
+            
+        }
+        
+           }
+}
+
+-(void)textFieldDidBeginEditing:(UITextField *)textField{
+    NSLog(@"self.info.layer %@",self.info.layer.animationKeys);
+    [self.info.layer removeAnimationForKey:@"infoappear"];
     
 }
 
