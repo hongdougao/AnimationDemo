@@ -54,13 +54,7 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
 @end
 
 @implementation BaseViewController
-//- (void)delay:(double)seconds andCompletion: (void (^)(void))completionHandle{
-//    dispatch_time_t  popTime =  dispatch_time(DISPATCH_TIME_NOW, (int64_t)( NSEC_PER_SEC  *seconds));
-//    
-//    dispatch_after(popTime, dispatch_get_main_queue(), ^{
-//        completionHandle();
-//    });
-//}
+
 - (UIActivityIndicatorView *)spinner{
     if (!_spinner) {
         _spinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -200,15 +194,7 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ 
 - (void)showMessage :(int)index{
     self.label.text = self.messages[index];
    [ UIView transitionWithView:self.status duration:0.33 options:UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionTransitionFlipFromBottom animations:^{
