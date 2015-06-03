@@ -74,8 +74,6 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self beginAnimation];
-    [self showTitleAndDetail];
-    [self customGroupAnimation];
     [self beginPutView];
 }
 - (void)beginPutView{
@@ -135,19 +133,65 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     [fadeIn setFillMode:kCAFillModeBackwards];
     
     
-//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.5];
-//    [_cloud1.layer addAnimation:fadeIn forKey:nil];
-//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.7];
-//    [_cloud2.layer addAnimation:fadeIn forKey:nil];
-//    [fadeIn setBeginTime:CACurrentMediaTime() + 0.9];
-//    [_cloud3.layer addAnimation:fadeIn forKey:nil];
-//    [fadeIn setBeginTime:CACurrentMediaTime() +1.1];
-//    [_cloud4.layer addAnimation:fadeIn forKey:nil];
+    [fadeIn setBeginTime:CACurrentMediaTime() + 0.5];
+    [_cloud1.layer addAnimation:fadeIn forKey:nil];
+    [fadeIn setBeginTime:CACurrentMediaTime() + 0.7];
+    [_cloud2.layer addAnimation:fadeIn forKey:nil];
+    [fadeIn setBeginTime:CACurrentMediaTime() + 0.9];
+    [_cloud3.layer addAnimation:fadeIn forKey:nil];
+    [fadeIn setBeginTime:CACurrentMediaTime() +1.1];
+    [_cloud4.layer addAnimation:fadeIn forKey:nil];
     
-    [self animateCloud:self.cloud1.layer];
-    [self animateCloud:self.cloud2.layer];
-    [self animateCloud:self.cloud3.layer];
-    [self animateCloud:self.cloud4.layer];
+
+
+
+}
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    
+    CAAnimationGroup *formGroup = [CAAnimationGroup animation];
+    [formGroup setDuration:0.5];
+    [formGroup setFillMode:kCAFillModeBackwards];
+    
+    CABasicAnimation *flyRight = [CABasicAnimation animationWithKeyPath:@"position.x"];
+    [flyRight setFromValue: [NSNumber numberWithDouble: - self.view.bounds.size.width /2]];
+    [flyRight setToValue:[NSNumber numberWithDouble:self.view.bounds.size.width]];
+    
+    CABasicAnimation *fadeFieldIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    [fadeFieldIn setFromValue:[NSNumber numberWithDouble:0.25]];
+    [fadeFieldIn setToValue: [NSNumber numberWithDouble:1.0]];
+    
+    [formGroup setAnimations:@[flyRight,fadeFieldIn]];
+    [self.heading.layer  addAnimation:formGroup forKey:nil];
+    
+    [formGroup setDelegate:self];
+    [formGroup setValue:@"form" forKey:@"name"];
+    [formGroup setValue:self.username.layer forKey:@"layer"];
+    
+    [formGroup setBeginTime:CACurrentMediaTime() + 0.4];
+    [self.username.layer addAnimation:formGroup forKey:nil];
+    
+    [formGroup setValue:self.password.layer forKey:@"layer"];
+    [formGroup setBeginTime:CACurrentMediaTime() + 0.4];
+    [self.password.layer addAnimation:formGroup forKey:nil];
+    
+ 
+    [self customGroupAnimation];
+
+    
+    CABasicAnimation *flyLeft = [CABasicAnimation animationWithKeyPath:@"position.x"];
+    [flyLeft setFromValue:[NSNumber numberWithDouble:self.info.layer.position.x + self.view.frame.size.width]];
+    [flyLeft setToValue:[NSNumber numberWithDouble:self.info.layer.position.x]];
+    [flyLeft setDuration:5.0];
+    [self.info.layer addAnimation:flyLeft forKey:@"infoappear"];
+    
+    CABasicAnimation *fadeLabelIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    [fadeLabelIn setFromValue:[NSNumber numberWithDouble:0.2]];
+    [fadeLabelIn setToValue:[NSNumber numberWithDouble:1.0]];
+    [fadeLabelIn setDuration:4.5];
+    [self.info.layer addAnimation:fadeLabelIn forKey:@"fadein"];
+    
+    [self showTitleAndDetail];
 
 }
 
@@ -192,6 +236,11 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     
     groupAnimation.animations = @[scaleDown,rotate,fade];
     [self.loginButton.layer addAnimation:groupAnimation forKey:nil];
+    
+    [self animateCloud:self.cloud1.layer];
+    [self animateCloud:self.cloud2.layer];
+    [self animateCloud:self.cloud3.layer];
+    [self animateCloud:self.cloud4.layer];
     
 }
 
@@ -312,6 +361,7 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
     [layer addAnimation:cloudMove forKey:nil];
 }
 -(void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag{
+    NSLog(@"anim value for key:%@",[anim valueForKey:@"name"]);
     if ([anim valueForKey:@"name"]) {
         NSString *name = [anim valueForKey:@"name"];
         if ( [name isEqualToString:@"form"]) {
@@ -325,6 +375,8 @@ void roundCorner(CALayer *layer, CGFloat toRadius){
             [pulse setDuration:0.25];
             [layer  addAnimation:pulse forKey:nil];
         }else if (  [name isEqualToString:@"cloud"]){
+            NSLog(@"cloud annimation stop");
+
             CALayer *layer = [anim valueForKey:@"layer"];
             [anim setValue:nil forKey:@"layer"];
             
